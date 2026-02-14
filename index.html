@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
+  <title>Afternoon Wick Scanner</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1b33;
+      --panel2:#101f3d;
+      --text:#e8eefc;
+      --muted:#9fb0d8;
+      --line:rgba(255,255,255,.12);
+      --ok:#47d18c;
+      --ng:#ff5c6c;
+      --warn:#ffcc66;
+      --btn:#1b2d57;
+      --btn2:#243b72;
+      --focus:#6aa8ff;
+    }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+  background: radial-gradient(1200px 700px at 20% -10%, rgba(106,168,255,.18), transparent 60%),
+              radial-gradient(900px 600px at 80% 0%, rgba(71,209,140,.12), transparent 55%),
+              radial-gradient(900px 700px at 50% 110%, rgba(255,204,102,.10), transparent 55%),
+              var(--bg);
+  color:var(--text);
+}
+
+.top{
+  position: sticky;
+  top:0;
+  z-index:10;
+  background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.70));
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.top__inner{
+  max-width: 1200px;
+  margin:0 auto;
+  padding:14px 16px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content: space-between;
+}
+.brand__title{
+  font-weight:800;
+  letter-spacing:.2px;
+  font-size:16px;
+}
+.brand__sub{
+  margin-top:2px;
+  font-size:12px;
+  color:var(--muted);
+}
+.chip{
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background: rgba(15,27,51,.6);
+  font-size:12px;
+  color:var(--muted);
+  min-width: 84px;
+  text-align:center;
+}
+
+.wrap{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.card{
+  background: linear-gradient(180deg, rgba(16,31,61,.75), rgba(15,27,51,.65));
+  border:1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.card__title{
+  margin:0 0 10px 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (max-width: 980px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .top__inner{flex-direction:column;align-items:flex-start}
+  .chip{align-self:flex-end}
+}
+
+.field{display:block}
+.field__label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.field__hint{font-size:11px;color:rgba(159,176,216,.9);margin-top:6px}
+
+.input, .textarea, select.input{
+  width:100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(11,18,32,.55);
+  color: var(--text);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.textarea{resize: vertical; min-height: 140px; line-height: 1.35}
+
+.input:focus, .textarea:focus, select.input:focus{
+  border-color: rgba(106,168,255,.65);
+  box-shadow: 0 0 0 3px rgba(106,168,255,.18);
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  flex-wrap: wrap;
+}
+.spacer{flex:1}
+
+.btn{
+  border:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(27,45,87,.85), rgba(27,45,87,.65));
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor:pointer;
+  transition: transform .05s, filter .15s, border-color .15s;
+}
+.btn:hover{filter: brightness(1.08)}
+.btn:active{transform: translateY(1px)}
+.btn--ghost{background: rgba(11,18,32,.35)}
+.btn--primary{
+  border-color: rgba(71,209,140,.55);
+  background: linear-gradient(180deg, rgba(36,59,114,.92), rgba(27,45,87,.75));
+}
+
+.check{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.check input{transform: translateY(1px)}
+
+.note{
+  margin-top:10px;
+  font-size:12px;
+  color: rgba(255,204,102,.95);
+  border:1px solid rgba(255,204,102,.35);
+  background: rgba(255,204,102,.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.log{
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(11,18,32,.35);
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 44px;
+  white-space: pre-wrap;
+}
+
+.legend{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.legend__item{display:flex;gap:8px;align-items:center}
+.dot{
+  width:10px;height:10px;border-radius:50%;
+  background: rgba(255,255,255,.25);
+  border:1px solid var(--line);
+}
+.dot--ok{background: rgba(71,209,140,.95); border-color: rgba(71,209,140,.55)}
+.dot--ng{background: rgba(255,92,108,.95); border-color: rgba(255,92,108,.55)}
+.dot--warn{background: rgba(255,204,102,.95); border-color: rgba(255,204,102,.55)}
+
+.tableWrap{overflow:auto;border-radius: 12px;border:1px solid var(--line)}
+.tbl{
+  width:100%;
+  border-collapse: collapse;
+  min-width: 1050px;
+}
+.tbl th,.tbl td{
+  border-bottom:1px solid var(--line);
+  padding: 10px 10px;
+  font-size:12px;
+  text-align:left;
+  vertical-align: top;
+}
+.tbl thead th{
+  position: sticky;
+  top:0;
+  background: rgba(11,18,32,.92);
+  backdrop-filter: blur(6px);
+  z-index:1;
+  font-weight: 800;
+}
+.muted{color: var(--muted)}
+.badge{
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+  padding:6px 10px;
+  border-radius: 999px;
+  border:1px solid var(--line);
+  font-weight: 800;
+}
+.badge--ok{border-color: rgba(71,209,140,.55); background: rgba(71,209,140,.10)}
+.badge--ng{border-color: rgba(255,92,108,.55); background: rgba(255,92,108,.10)}
+.badge--warn{border-color: rgba(255,204,102,.55); background: rgba(255,204,102,.10)}
+.small{font-size:11px;color:var(--muted)}
+
+.foot{
+  margin-top: 18px;
+  border-top:1px solid var(--line);
+  background: rgba(11,18,32,.45);
+}
+.foot__inner{
+  max-width:1200px;
+  margin:0 auto;
+  padding: 14px 16px;
+}  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top__inner">
+      <div class="brand">
+        <div class="brand__title">Afternoon Wick Scanner</div>
+        <div class="brand__sub">午後に崩れて戻した「下ひげ」＋13:00〜14:55 -2% の翌日買い候補</div>
+      </div>
+      <div class="chip" id="statusChip">待機中</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="card">
+      <h2 class="card__title">API設定（RapidAPI）</h2>
+  <div class="grid2">
+    <label class="field">
+      <div class="field__label">x-rapidapi-host</div>
+      <input class="input" id="apiHost" value="yh-finance.p.rapidapi.com" autocomplete="off" spellcheck="false" />
+      <div class="field__hint">通常はこのまま（Yahoo Finance API系）</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">x-rapidapi-key</div>
+      <input class="input" id="apiKey" type="password" placeholder="RapidAPIのキーを貼る" autocomplete="off" spellcheck="false" />
+      <div class="field__hint">ローカル保存（この端末のlocalStorage）できます</div>
+    </label>
+  </div>
+
+  <div class="row">
+    <button class="btn" id="saveBtn">保存</button>
+    <button class="btn btn--ghost" id="clearBtn">保存クリア</button>
+    <div class="spacer"></div>
+    <button class="btn btn--ghost" id="testBtn">接続テスト（7203.T）</button>
+  </div>
+
+  <div class="note">
+    注意：RapidAPIキーをフロントに置く実装です。公開運用でキー秘匿が必要なら、Cloudflare Workers等の薄いプロキシに寄せてください。
+  </div>
+</section>
+
+<section class="card">
+  <h2 class="card__title">スクリーニング条件</h2>
+
+  <div class="grid3">
+    <label class="field">
+      <div class="field__label">A）下ひげ / 実体</div>
+      <input class="input" id="minWickToBody" type="number" step="0.1" value="1.5" />
+      <div class="field__hint">下ひげ長 ÷ |終値-始値|</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">A代替）下ひげ / レンジ</div>
+      <input class="input" id="minWickToRange" type="number" step="0.01" value="0.45" />
+      <div class="field__hint">下ひげ長 ÷ (高値-安値)</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">B）終値位置</div>
+      <input class="input" id="minClosePos" type="number" step="0.01" value="0.65" />
+      <div class="field__hint">(終値-安値) ÷ (高値-安値)</div>
+    </label>
+  </div>
+
+  <div class="grid3">
+    <label class="field">
+      <div class="field__label">C）出来高 最低</div>
+      <input class="input" id="minVolume" type="number" step="1000" value="100000" />
+      <div class="field__hint">出来高 ≥ 10万（最低条件）</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">C補強）出来高の裏付け</div>
+      <select class="input" id="volRule">
+        <option value="prev_or_avg5" selected>前日比で増 OR 直近5日平均以上</option>
+        <option value="prev_only">前日比で増のみ</option>
+        <option value="avg5_only">直近5日平均以上のみ</option>
+        <option value="none">裏付けなし（最低出来高のみ）</option>
+      </select>
+      <div class="field__hint">閑散ノイズを弾く</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">D）午後の一時的下落</div>
+      <input class="input" id="minDropPct" type="number" step="0.1" value="2.0" />
+      <div class="field__hint">13:00〜14:55の最安値が基準から -X% 以上</div>
+    </label>
+  </div>
+
+  <div class="grid3">
+    <label class="field">
+      <div class="field__label">D）下落率の基準</div>
+      <select class="input" id="dropRef">
+        <option value="day_open" selected>当日 始値（日足）</option>
+        <option value="p1300_close">13:00時点の終値（5分足）</option>
+      </select>
+      <div class="field__hint">「一時的に-2%」の解釈を固定</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">マーケット</div>
+      <select class="input" id="region">
+        <option value="JP" selected>JP</option>
+        <option value="US">US</option>
+        <option value="GB">GB</option>
+        <option value="HK">HK</option>
+      </select>
+      <div class="field__hint">日本株はJP（銘柄は .T 推奨）</div>
+    </label>
+
+    <label class="field">
+      <div class="field__label">時間帯（固定）</div>
+      <input class="input" value="13:00〜14:55 JST" disabled />
+      <div class="field__hint">日本市場の後場を想定</div>
+    </label>
+  </div>
+
+  <div class="row">
+    <label class="check">
+      <input type="checkbox" id="strictAll" checked />
+      <span>厳格：A・B・C・Dすべて必須</span>
+    </label>
+    <div class="spacer"></div>
+    <label class="check">
+      <input type="checkbox" id="showFails" />
+      <span>落選理由も表示</span>
+    </label>
+  </div>
+</section>
+
+<section class="card">
+  <h2 class="card__title">銘柄リスト</h2>
+
+  <label class="field">
+    <div class="field__label">対象銘柄（1行1銘柄 / カンマ区切りも可）</div>
+    <textarea class="textarea" id="symbols" rows="8" placeholder="例：7203.T&#10;9432.T&#10;9984.T"></textarea>
+    <div class="field__hint">スキャンはAPI呼び出しが多いので、まずは20〜50銘柄くらいから推奨</div>
+  </label>
+
+  <div class="row">
+    <button class="btn btn--primary" id="scanBtn">スキャン</button>
+    <button class="btn btn--ghost" id="sampleBtn">サンプル投入</button>
+    <button class="btn btn--ghost" id="exportBtn">結果CSV（コピー用）</button>
+    <div class="spacer"></div>
+    <button class="btn btn--ghost" id="resetBtn">結果リセット</button>
+  </div>
+
+  <div class="log" id="log"></div>
+</section>
+
+<section class="card">
+  <h2 class="card__title">結果</h2>
+
+  <div class="legend">
+    <div class="legend__item"><span class="dot dot--ok"></span>合格</div>
+    <div class="legend__item"><span class="dot dot--ng"></span>不合格</div>
+    <div class="legend__item"><span class="dot dot--warn"></span>データ欠損（判定不能）</div>
+  </div>
+
+  <div class="tableWrap">
+    <table class="tbl" id="resultTable">
+      <thead>
+        <tr>
+          <th>判定</th>
+          <th>銘柄</th>
+          <th>日付</th>
+          <th>下ひげ/実体</th>
+          <th>下ひげ/レンジ</th>
+          <th>終値位置</th>
+          <th>出来高</th>
+          <th>前日比</th>
+          <th>5日平均比</th>
+          <th>D:午後ドロップ</th>
+          <th>メモ</th>
+        </tr>
+      </thead>
+      <tbody id="resultBody">
+        <tr><td class="muted" colspan="11">まだ結果はありません</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section> 
+  </main>
+    <footer class="foot">
+    <div class="foot__inner">
+      <div class="muted">
+        このツールはスクリーニング補助です。売買判断は自己責任・前提の確認（決算/材料/地合い）込みで。
+      </div>
+    </div>
+  </footer>
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (id) => document.getElementById(id);
+
+      const els = {
+        apiHost: $("apiHost"),
+        apiKey: $("apiKey"),
+        saveBtn: $("saveBtn"),
+        clearBtn: $("clearBtn"),
+        testBtn: $("testBtn"),
+
+        minWickToBody: $("minWickToBody"),
+        minWickToRange: $("minWickToRange"),
+        minClosePos: $("minClosePos"),
+        minVolume: $("minVolume"),
+        volRule: $("volRule"),
+        minDropPct: $("minDropPct"),
+        dropRef: $("dropRef"),
+        region: $("region"),
+        strictAll: $("strictAll"),
+        showFails: $("showFails"),
+
+        symbols: $("symbols"),
+        scanBtn: $("scanBtn"),
+        sampleBtn: $("sampleBtn"),
+        exportBtn: $("exportBtn"),
+        resetBtn: $("resetBtn"),
+
+        log: $("log"),
+        statusChip: $("statusChip"),
+
+        resultBody: $("resultBody"),
+        resultTable: $("resultTable"),
+      };
+
+      const LS_KEY = "awscanner_v1";
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      function nowStr() {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+      }
+
+      function setStatus(text, mode) {
+        els.statusChip.textContent = text;
+        els.statusChip.style.borderColor = "rgba(255,255,255,.12)";
+        els.statusChip.style.color = "var(--muted)";
+        if (mode === "ok") {
+          els.statusChip.style.borderColor = "rgba(71,209,140,.55)";
+          els.statusChip.style.color = "var(--ok)";
+        }
+        if (mode === "ng") {
+          els.statusChip.style.borderColor = "rgba(255,92,108,.55)";
+          els.statusChip.style.color = "var(--ng)";
+        }
+        if (mode === "warn") {
+          els.statusChip.style.borderColor = "rgba(255,204,102,.55)";
+          els.statusChip.style.color = "var(--warn)";
+        }
+      }
+
+      function log(line) {
+        const prev = els.log.textContent || "";
+        els.log.textContent = (prev ? prev + "\n" : "") + "[" + nowStr() + "] " + line;
+        els.log.scrollTop = els.log.scrollHeight;
+      }
+
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(LS_KEY);
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          if (s.apiHost) els.apiHost.value = s.apiHost;
+          if (s.apiKey) els.apiKey.value = s.apiKey;
+          if (s.symbols) els.symbols.value = s.symbols;
+
+          if (s.minWickToBody != null) els.minWickToBody.value = s.minWickToBody;
+          if (s.minWickToRange != null) els.minWickToRange.value = s.minWickToRange;
+          if (s.minClosePos != null) els.minClosePos.value = s.minClosePos;
+          if (s.minVolume != null) els.minVolume.value = s.minVolume;
+          if (s.volRule) els.volRule.value = s.volRule;
+          if (s.minDropPct != null) els.minDropPct.value = s.minDropPct;
+          if (s.dropRef) els.dropRef.value = s.dropRef;
+          if (s.region) els.region.value = s.region;
+          if (s.strictAll != null) els.strictAll.checked = !!s.strictAll;
+          if (s.showFails != null) els.showFails.checked = !!s.showFails;
+        } catch (_) {}
+      }
+
+      function saveSettings() {
+        const s = {
+          apiHost: els.apiHost.value.trim(),
+          apiKey: els.apiKey.value.trim(),
+          symbols: els.symbols.value,
+
+          minWickToBody: num(els.minWickToBody.value, 1.5),
+          minWickToRange: num(els.minWickToRange.value, 0.45),
+          minClosePos: num(els.minClosePos.value, 0.65),
+          minVolume: Math.max(0, Math.floor(num(els.minVolume.value, 100000))),
+          volRule: els.volRule.value,
+          minDropPct: num(els.minDropPct.value, 2.0),
+          dropRef: els.dropRef.value,
+          region: els.region.value,
+          strictAll: els.strictAll.checked,
+          showFails: els.showFails.checked,
+        };
+        localStorage.setItem(LS_KEY, JSON.stringify(s));
+      }
+
+      function clearSettings() {
+        localStorage.removeItem(LS_KEY);
+      }
+
+      function num(v, def) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : def;
+      }
+
+      function parseSymbols(text) {
+        const raw = (text || "")
+          .replace(/\r/g, "\n")
+          .split(/[\n,]+/g)
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        const seen = new Set();
+        const out = [];
+        for (const s of raw) {
+          const key = s.toUpperCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push(s);
+        }
+        return out;
+      }
+
+      function fmt(n, d = 2) {
+        if (!Number.isFinite(n)) return "-";
+        return n.toFixed(d);
+      }
+
+      function fmtInt(n) {
+        if (!Number.isFinite(n)) return "-";
+        return String(Math.round(n));
+      }
+
+      function pct(n, d = 2) {
+        if (!Number.isFinite(n)) return "-";
+        return (n * 100).toFixed(d) + "%";
+      }
+
+      function jstDateKeyFromEpochSec(sec) {
+        const ms = sec * 1000;
+        const d = new Date(ms);
+        const jp = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+        const y = jp.getUTCFullYear();
+        const m = String(jp.getUTCMonth() + 1).padStart(2, "0");
+        const da = String(jp.getUTCDate()).padStart(2, "0");
+        return y + "-" + m + "-" + da;
+      }
+
+      function jstHHMMFromEpochSec(sec) {
+        const ms = sec * 1000;
+        const d = new Date(ms);
+        const jp = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+        const hh = String(jp.getUTCHours()).padStart(2, "0");
+        const mm = String(jp.getUTCMinutes()).padStart(2, "0");
+        return hh + ":" + mm;
+      }
+
+      function withinHHMM(hhmm, start, end) {
+        return hhmm >= start && hhmm <= end;
+      }
+
+      async function fetchJSON(url, host, key) {
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            "x-rapidapi-host": host,
+            "x-rapidapi-key": key,
+          },
+        });
+        if (!res.ok) {
+          const t = await res.text().catch(() => "");
+          throw new Error("HTTP " + res.status + " " + res.statusText + " / " + t.slice(0, 200));
+        }
+        return await res.json();
+      }
+
+      function safeArr(a) {
+        return Array.isArray(a) ? a : [];
+      }
+
+      function extractDailySeries(chart) {
+        const r = chart && chart.chart && chart.chart.result && chart.chart.result[0];
+        if (!r) return null;
+
+        const ts = safeArr(r.timestamp);
+        const q = (r.indicators && r.indicators.quote && r.indicators.quote[0]) || {};
+        const opens = safeArr(q.open);
+        const highs = safeArr(q.high);
+        const lows = safeArr(q.low);
+        const closes = safeArr(q.close);
+        const vols = safeArr(q.volume);
+
+        const out = [];
+        for (let i = 0; i < ts.length; i++) {
+          const o = opens[i], h = highs[i], l = lows[i], c = closes[i];
+          const v = vols[i];
+          if (![o,h,l,c].every((x) => Number.isFinite(x))) continue;
+          out.push({
+            ts: ts[i],
+            date: jstDateKeyFromEpochSec(ts[i]),
+            open: o, high: h, low: l, close: c,
+            volume: Number.isFinite(v) ? v : null,
+          });
+        }
+        return out;
+      }
+
+      function computeDailyMetrics(day) {
+        const body = Math.abs(day.close - day.open);
+        const range = day.high - day.low;
+        const lowerWick = Math.min(day.open, day.close) - day.low;
+
+        const eps = 1e-9;
+        const bodyAdj = Math.max(body, eps);
+        const rangeAdj = Math.max(range, eps);
+
+        const wickToBody = lowerWick / bodyAdj;
+        const wickToRange = lowerWick / rangeAdj;
+        const closePos = (day.close - day.low) / rangeAdj;
+
+        return { body, range, lowerWick, wickToBody, wickToRange, closePos };
+      }
+
+      function volumeRulePass(vol, prevVol, avg5, rule, minVol) {
+        if (!Number.isFinite(vol)) return { pass: false, note: "出来高欠損" };
+        if (vol < minVol) return { pass: false, note: "出来高<" + minVol };
+
+        if (rule === "none") return { pass: true, note: "OK" };
+
+        const pPrev = Number.isFinite(prevVol) ? (vol > prevVol) : false;
+        const pAvg = Number.isFinite(avg5) ? (vol >= avg5) : false;
+
+        if (rule === "prev_only") return { pass: pPrev, note: pPrev ? "前日比増" : "前日比増なし" };
+        if (rule === "avg5_only") return { pass: pAvg, note: pAvg ? "5日平均以上" : "5日平均未満" };
+
+        const pass = pPrev || pAvg;
+        const note = pass ? (pPrev && pAvg ? "前日比増+5日平均以上" : (pPrev ? "前日比増" : "5日平均以上")) : "裏付け不足";
+        return { pass, note };
+      }
+
+      function findIntradayWindowMin(chart, targetDateKey) {
+        const r = chart && chart.chart && chart.chart.result && chart.chart.result[0];
+        if (!r) return null;
+
+        const ts = safeArr(r.timestamp);
+        const q = (r.indicators && r.indicators.quote && r.indicators.quote[0]) || {};
+        const lows = safeArr(q.low);
+        const closes = safeArr(q.close);
+
+        let minLow = Infinity;
+        let firstCloseAt1300 = null;
+        let hasAny = false;
+
+        for (let i = 0; i < ts.length; i++) {
+          const dateKey = jstDateKeyFromEpochSec(ts[i]);
+          if (dateKey !== targetDateKey) continue;
+
+          const hhmm = jstHHMMFromEpochSec(ts[i]);
+
+          if (firstCloseAt1300 == null && hhmm >= "13:00" && hhmm <= "13:05") {
+            const c = closes[i];
+            if (Number.isFinite(c)) firstCloseAt1300 = c;
+          }
+
+          if (!withinHHMM(hhmm, "13:00", "14:55")) continue;
+
+          const l = lows[i];
+          if (!Number.isFinite(l)) continue;
+
+          hasAny = true;
+          if (l < minLow) minLow = l;
+        }
+
+        if (!hasAny || !Number.isFinite(minLow)) return null;
+
+        return { minLow, firstCloseAt1300 };
+      }
+
+      function computeDrop(minLow, refPrice) {
+        if (!Number.isFinite(minLow) || !Number.isFinite(refPrice) || refPrice <= 0) return null;
+        return (minLow / refPrice) - 1;
+      }
+
+      function clearResults() {
+        els.resultBody.innerHTML = '<tr><td class="muted" colspan="11">まだ結果はありません</td></tr>';
+      }
+
+      function escapeHTML(s) {
+        return String(s ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function rowBadge(kind, text) {
+        const cls = kind === "ok" ? "badge badge--ok" : kind === "ng" ? "badge badge--ng" : "badge badge--warn";
+        const dot = kind === "ok" ? "dot dot--ok" : kind === "ng" ? "dot dot--ng" : "dot dot--warn";
+        return '<span class="' + cls + '"><span class="' + dot + '"></span>' + escapeHTML(text) + '</span>';
+      }
+
+      function setRows(rows) {
+        if (!rows.length) {
+          els.resultBody.innerHTML = '<tr><td class="muted" colspan="11">該当なし</td></tr>';
+          return;
+        }
+        els.resultBody.innerHTML = rows.join("");
+      }
+
+      function makeRow(res) {
+        const badge = res.kind === "ok" ? rowBadge("ok", "合格") : res.kind === "ng" ? rowBadge("ng", "不合格") : rowBadge("warn", "判定不能");
+        const memo = res.memo || "";
+        return '' +
+          '<tr>' +
+            '<td>' + badge + '</td>' +
+            '<td><div style="font-weight:800">' + escapeHTML(res.symbol) + '</div><div class="small">' + escapeHTML(res.name || "") + '</div></td>' +
+            '<td>' + escapeHTML(res.date || "-") + '</td>' +
+            '<td>' + escapeHTML(res.wickToBody) + '</td>' +
+            '<td>' + escapeHTML(res.wickToRange) + '</td>' +
+            '<td>' + escapeHTML(res.closePos) + '</td>' +
+            '<td>' + escapeHTML(res.volume) + '</td>' +
+            '<td>' + escapeHTML(res.vsPrev) + '</td>' +
+            '<td>' + escapeHTML(res.vsAvg5) + '</td>' +
+            '<td>' + escapeHTML(res.drop) + '</td>' +
+            '<td>' + escapeHTML(memo) + '</td>' +
+          '</tr>';
+      }
+
+      function toCsvValue(s) {
+        const t = String(s ?? "");
+        if (t.includes('"') || t.includes(",") || t.includes("\n")) {
+          return '"' + t.replaceAll('"', '""') + '"';
+        }
+        return t;
+      }
+
+      function buildCsv(exportRows) {
+        const header = ["symbol","date","wickToBody","wickToRange","closePos","volume","vol_vs_prev","vol_vs_avg5","drop_13to1455","memo"].join(",");
+        const lines = exportRows.map(r => [
+          r.symbol, r.date, r.wickToBody, r.wickToRange, r.closePos, r.volume, r.vsPrev, r.vsAvg5, r.drop, r.memo
+        ].map(toCsvValue).join(","));
+        return [header, ...lines].join("\n");
+      }
+
+      async function scanOne(symbol, cfg) {
+        const base = "https://" + cfg.host;
+        const region = encodeURIComponent(cfg.region);
+        const sym = encodeURIComponent(symbol);
+
+        const urlDaily = base + "/stock/v2/get-chart?interval=1d&symbol=" + sym + "&range=10d&region=" + region;
+        const daily = await fetchJSON(urlDaily, cfg.host, cfg.key);
+
+        const series = extractDailySeries(daily);
+        if (!series || series.length < 6) {
+          return { kind: "warn", symbol: symbol, memo: "日足データ不足（6本未満）" };
+        }
+
+        const d0 = series[series.length - 1];
+        const d1 = series[series.length - 2];
+
+        const last6 = series.slice(-6);
+        const prev5 = last6.slice(0, 5);
+        const prev5Vols = prev5.map(x => x.volume).filter(v => Number.isFinite(v));
+        const avg5 = prev5Vols.reduce((a,b) => a + b, 0) / Math.max(1, prev5Vols.length);
+
+        const met = computeDailyMetrics(d0);
+
+        const passA = (met.wickToBody >= cfg.minWickToBody) || (met.wickToRange >= cfg.minWickToRange);
+        const passB = met.closePos >= cfg.minClosePos;
+
+        const volCheck = volumeRulePass(d0.volume, d1.volume, avg5, cfg.volRule, cfg.minVolume);
+        const passC = volCheck.pass;
+
+        const urlIntra = base + "/stock/v2/get-chart?interval=5m&symbol=" + sym + "&range=1d&region=" + region;
+        const intra = await fetchJSON(urlIntra, cfg.host, cfg.key);
+
+        const win = findIntradayWindowMin(intra, d0.date);
+        if (!win) {
+          const memo = "5分足なし（休場/遅延/非対応）";
+          const strictFail = cfg.strictAll ? "（厳格では不合格扱い）" : "";
+          return {
+            kind: cfg.strictAll ? "ng" : "warn",
+            symbol: symbol,
+            name: (daily && daily.chart && daily.chart.result && daily.chart.result[0] && daily.chart.result[0].meta && daily.chart.result[0].meta.shortName) || "",
+            date: d0.date,
+            wickToBody: fmt(met.wickToBody, 2),
+            wickToRange: fmt(met.wickToRange, 2),
+            closePos: fmt(met.closePos, 2),
+            volume: fmtInt(d0.volume),
+            vsPrev: (Number.isFinite(d1.volume) && d1.volume > 0) ? pct((d0.volume / d1.volume) - 1, 2) : "-",
+            vsAvg5: (Number.isFinite(avg5) && avg5 > 0) ? pct((d0.volume / avg5) - 1, 2) : "-",
+            drop: "-",
+            memo: memo + strictFail
+          };
+        }
+
+        const dropRefPrice = (cfg.dropRef === "p1300_close") ? win.firstCloseAt1300 : d0.open;
+        const drop = computeDrop(win.minLow, dropRefPrice);
+        const needDrop = -Math.abs(cfg.minDropPct) / 100;
+        const passD = (drop != null) && (drop <= needDrop);
+
+        const allPass = cfg.strictAll ? (passA && passB && passC && passD) : ((passA && passB) && (passC || passD));
+        const kind = allPass ? "ok" : "ng";
+
+        const reasons = [];
+        if (!passA) reasons.push("A未満");
+        if (!passB) reasons.push("B未満");
+        if (!passC) reasons.push("C未満:" + volCheck.note);
+        if (!passD) reasons.push("D未満");
+        const memo = kind === "ok" ? "OK" : (reasons.join(" / ") || "NG");
+
+        const name = (daily && daily.chart && daily.chart.result && daily.chart.result[0] && daily.chart.result[0].meta && daily.chart.result[0].meta.shortName) || "";
+
+        return {
+          kind: kind,
+          symbol: symbol,
+          name: name,
+          date: d0.date,
+          wickToBody: fmt(met.wickToBody, 2),
+          wickToRange: fmt(met.wickToRange, 2),
+          closePos: fmt(met.closePos, 2),
+          volume: fmtInt(d0.volume),
+          vsPrev: (Number.isFinite(d1.volume) && d1.volume > 0) ? pct((d0.volume / d1.volume) - 1, 2) : "-",
+          vsAvg5: (Number.isFinite(avg5) && avg5 > 0) ? pct((d0.volume / avg5) - 1, 2) : "-",
+          drop: drop == null ? "-" : pct(drop, 2),
+          memo: cfg.showFails ? memo : (kind === "ok" ? "OK" : ""),
+          _export: {
+            symbol: symbol,
+            date: d0.date,
+            wickToBody: fmt(met.wickToBody, 4),
+            wickToRange: fmt(met.wickToRange, 4),
+            closePos: fmt(met.closePos, 4),
+            volume: Number.isFinite(d0.volume) ? String(Math.round(d0.volume)) : "",
+            vsPrev: (Number.isFinite(d1.volume) && d1.volume > 0) ? String(((d0.volume / d1.volume) - 1).toFixed(6)) : "",
+            vsAvg5: (Number.isFinite(avg5) && avg5 > 0) ? String(((d0.volume / avg5) - 1).toFixed(6)) : "",
+            drop: drop == null ? "" : String(drop.toFixed(6)),
+            memo: cfg.showFails ? memo : (kind === "ok" ? "OK" : ""),
+          }
+        };
+      }
+
+      async function runScan() {
+        saveSettings();
+
+        const host = els.apiHost.value.trim();
+        const key = els.apiKey.value.trim();
+        if (!host || !key) {
+          setStatus("API未設定", "ng");
+          log("API host / key が未設定です。");
+          return;
+        }
+
+        const symbols = parseSymbols(els.symbols.value);
+        if (!symbols.length) {
+          setStatus("銘柄なし", "ng");
+          log("銘柄リストが空です。");
+          return;
+        }
+
+        const cfg = {
+          host: host,
+          key: key,
+          region: els.region.value,
+          minWickToBody: num(els.minWickToBody.value, 1.5),
+          minWickToRange: num(els.minWickToRange.value, 0.45),
+          minClosePos: num(els.minClosePos.value, 0.65),
+          minVolume: Math.max(0, Math.floor(num(els.minVolume.value, 100000))),
+          volRule: els.volRule.value,
+          minDropPct: num(els.minDropPct.value, 2.0),
+          dropRef: els.dropRef.value,
+          strictAll: els.strictAll.checked,
+          showFails: els.showFails.checked,
+        };
+
+        setStatus("スキャン中", "warn");
+        els.scanBtn.disabled = true;
+
+        const rows = [];
+        const exportRows = [];
+        let okCount = 0;
+        let ngCount = 0;
+        let warnCount = 0;
+
+        clearResults();
+        log("開始：" + symbols.length + "銘柄 / region=" + cfg.region + " / strict=" + (cfg.strictAll ? "ON" : "OFF"));
+
+        for (let i = 0; i < symbols.length; i++) {
+          const sym = symbols[i];
+          try {
+            log("取得 " + (i+1) + "/" + symbols.length + "：" + sym);
+            const r = await scanOne(sym, cfg);
+            if (r.kind === "ok") okCount++;
+            if (r.kind === "ng") ngCount++;
+            if (r.kind === "warn") warnCount++;
+
+            if (cfg.showFails || r.kind === "ok") {
+              rows.push(makeRow(r));
+            } else {
+              if (r.kind === "ok") rows.push(makeRow(r));
+            }
+
+            if (cfg.showFails || r.kind === "ok") {
+              exportRows.push(r._export || {});
+            } else {
+              if (r.kind === "ok") exportRows.push(r._export || {});
+            }
+
+            setRows(rows);
+
+          } catch (e) {
+            warnCount++;
+            const msg = (e && e.message) ? e.message : String(e);
+            log("エラー：" + sym + " / " + msg);
+            const r = {
+              kind: "warn",
+              symbol: sym,
+              memo: "APIエラー",
+              date: "-",
+              wickToBody: "-",
+              wickToRange: "-",
+              closePos: "-",
+              volume: "-",
+              vsPrev: "-",
+              vsAvg5: "-",
+              drop: "-",
+              name: ""
+            };
+            if (cfg.showFails) rows.push(makeRow(r));
+            if (cfg.showFails) exportRows.push({ symbol: sym, date: "", memo: "APIエラー" });
+            setRows(rows);
+          }
+
+          await sleep(220);
+        }
+
+        window.__AW_EXPORT_ROWS__ = exportRows;
+
+        log("完了：合格=" + okCount + " / 不合格=" + ngCount + " / 判定不能=" + warnCount);
+        setStatus("完了：" + okCount + "件", okCount > 0 ? "ok" : "warn");
+        els.scanBtn.disabled = false;
+      }
+
+      async function testConnection() {
+        saveSettings();
+        const host = els.apiHost.value.trim();
+        const key = els.apiKey.value.trim();
+        const region = els.region.value;
+        if (!host || !key) {
+          setStatus("API未設定", "ng");
+          log("API host / key が未設定です。");
+          return;
+        }
+        try {
+          setStatus("テスト中", "warn");
+          const url = "https://" + host + "/stock/v2/get-chart?interval=1d&symbol=7203.T&range=5d&region=" + encodeURIComponent(region);
+          const j = await fetchJSON(url, host, key);
+          const name = (j && j.chart && j.chart.result && j.chart.result[0] && j.chart.result[0].meta && j.chart.result[0].meta.shortName) || "(nameなし)";
+          const series = extractDailySeries(j);
+          if (!series || !series.length) throw new Error("有効な日足バーが取得できません");
+          const last = series[series.length - 1];
+          log("接続OK：7203.T / " + name + " / " + last.date + " close=" + last.close);
+          setStatus("接続OK", "ok");
+        } catch (e) {
+          const msg = (e && e.message) ? e.message : String(e);
+          log("接続NG：" + msg);
+          setStatus("接続NG", "ng");
+        }
+      }
+
+      async function exportCsv() {
+        const rows = window.__AW_EXPORT_ROWS__ || [];
+        if (!rows.length) {
+          log("CSV出力：結果がありません。先にスキャンしてください。");
+          return;
+        }
+        const csv = buildCsv(rows);
+
+        try {
+          await navigator.clipboard.writeText(csv);
+          log("CSVコピー完了（クリップボード）：" + rows.length + "行");
+        } catch (_) {
+          // fallback: logに出す（長くなるので先頭だけ）
+          log("CSVコピー失敗：ブラウザ制限の可能性。手動コピー用に別ウィンドウを開きます。");
+          const w = window.open("", "_blank");
+          if (w) {
+            w.document.open();
+            w.document.write("<pre>" + escapeHTML(csv) + "</pre>");
+  </script>
+</body>
+</html>
